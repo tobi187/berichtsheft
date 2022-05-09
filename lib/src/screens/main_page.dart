@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:berichtsheft/src/models/berichtsheft_model.dart';
 import 'package:berichtsheft/src/services.dart/data_provider.dart';
 import 'package:berichtsheft/src/services.dart/mail_service.dart';
@@ -39,6 +41,10 @@ class _MainPageState extends State<MainPage> {
     berichtController.dispose();
     aufgabenController.dispose();
     schulController.dispose();
+    // DataProvider().saveData(BerichstsheftModel(
+    //     bericht: berichtController.text,
+    //     schule: schulController.text,
+    //     stichPunkte: aufgabenController.text));
   }
 
   @override
@@ -47,6 +53,13 @@ class _MainPageState extends State<MainPage> {
       appBar: AppBar(
         title: const Text('Berichtsheft'),
         actions: [
+          IconButton(
+              onPressed: () {
+                showDialog(
+                    context: context,
+                    builder: (BuildContext context) => const BlurryDialog());
+              },
+              icon: const Icon(Icons.delete)),
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {
@@ -71,6 +84,9 @@ class _MainPageState extends State<MainPage> {
             padding: const EdgeInsets.all(8.0),
             child: Card(
               child: TextField(
+                keyboardType: TextInputType.multiline,
+                minLines: 1,
+                maxLines: 30,
                 decoration: const InputDecoration(
                     contentPadding: EdgeInsets.all(8),
                     border: InputBorder.none),
@@ -88,6 +104,9 @@ class _MainPageState extends State<MainPage> {
             padding: const EdgeInsets.all(8.0),
             child: Card(
               child: TextField(
+                keyboardType: TextInputType.multiline,
+                minLines: 1,
+                maxLines: 30,
                 decoration: const InputDecoration(
                     contentPadding: EdgeInsets.all(8),
                     border: InputBorder.none),
@@ -105,6 +124,9 @@ class _MainPageState extends State<MainPage> {
             padding: const EdgeInsets.all(8.0),
             child: Card(
               child: TextField(
+                keyboardType: TextInputType.multiline,
+                minLines: 1,
+                maxLines: 30,
                 decoration: const InputDecoration(
                     contentPadding: EdgeInsets.all(8),
                     border: InputBorder.none),
@@ -128,7 +150,7 @@ class _MainPageState extends State<MainPage> {
                         content:
                             Text(success ? "send" : "something went wrong")));
                   },
-                  child: Text("Send Mail")),
+                  child: const Text("Send Mail")),
               ElevatedButton(
                   onPressed: () async {
                     bool succes = await DataProvider().saveData(
@@ -140,11 +162,43 @@ class _MainPageState extends State<MainPage> {
                       content: Text(succes ? "saved" : "something went wrong"),
                     ));
                   },
-                  child: Text("Save"))
+                  child: const Text("Save"))
             ],
           )
         ],
       ),
     );
+  }
+}
+
+class BlurryDialog extends StatelessWidget {
+  //VoidCallback continueCallBack;
+  const BlurryDialog({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+        child: AlertDialog(
+          title: const Text("Löschen", style: TextStyle(color: Colors.black)),
+          content: const Text("Den ganzen Text löschen?",
+              style: TextStyle(color: Colors.black)),
+          actions: <Widget>[
+            TextButton(
+              child: const Text("Ja"),
+              onPressed: () async {
+                // continueCallBack();
+                await DataProvider().delete();
+                Navigator.restorablePushNamed(context, MainPage.routeName);
+              },
+            ),
+            TextButton(
+              child: const Text("Abbrechen"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        ));
   }
 }
