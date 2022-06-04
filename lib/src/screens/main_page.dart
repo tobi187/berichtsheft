@@ -1,10 +1,10 @@
-import 'dart:ui';
-
 import 'package:berichtsheft/src/models/berichtsheft_model.dart';
 import 'package:berichtsheft/src/services.dart/data_provider.dart';
 import 'package:berichtsheft/src/services.dart/mail_service.dart';
 import 'package:berichtsheft/src/settings/settings_view.dart';
 import 'package:flutter/material.dart';
+
+import '../widgets/delete_popup.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({Key? key}) : super(key: key);
@@ -22,7 +22,7 @@ class _MainPageState extends State<MainPage> {
   final TextEditingController schulController = TextEditingController();
 
   void getSavedData() async {
-    data = await DataProvider().getData();
+    data = await DataProvider.getData();
     aufgabenController.text = data.stichPunkte;
     berichtController.text = data.bericht;
     schulController.text = data.schule;
@@ -37,7 +37,6 @@ class _MainPageState extends State<MainPage> {
 
   @override
   void dispose() {
-    super.dispose();
     berichtController.dispose();
     aufgabenController.dispose();
     schulController.dispose();
@@ -45,6 +44,7 @@ class _MainPageState extends State<MainPage> {
     //     bericht: berichtController.text,
     //     schule: schulController.text,
     //     stichPunkte: aufgabenController.text));
+    super.dispose();
   }
 
   @override
@@ -57,7 +57,7 @@ class _MainPageState extends State<MainPage> {
               onPressed: () {
                 showDialog(
                     context: context,
-                    builder: (BuildContext context) => const BlurryDialog());
+                    builder: (BuildContext context) => const DeletionPopup());
               },
               icon: const Icon(Icons.delete)),
           IconButton(
@@ -153,7 +153,7 @@ class _MainPageState extends State<MainPage> {
                   child: const Text("Send Mail")),
               ElevatedButton(
                   onPressed: () async {
-                    bool succes = await DataProvider().saveData(
+                    bool succes = await DataProvider.saveData(
                         BerichstsheftModel(
                             bericht: berichtController.text,
                             stichPunkte: aufgabenController.text,
@@ -168,37 +168,5 @@ class _MainPageState extends State<MainPage> {
         ],
       ),
     );
-  }
-}
-
-class BlurryDialog extends StatelessWidget {
-  //VoidCallback continueCallBack;
-  const BlurryDialog({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
-        child: AlertDialog(
-          title: const Text("Löschen", style: TextStyle(color: Colors.black)),
-          content: const Text("Den ganzen Text löschen?",
-              style: TextStyle(color: Colors.black)),
-          actions: <Widget>[
-            TextButton(
-              child: const Text("Ja"),
-              onPressed: () async {
-                // continueCallBack();
-                await DataProvider().delete();
-                Navigator.restorablePushNamed(context, MainPage.routeName);
-              },
-            ),
-            TextButton(
-              child: const Text("Abbrechen"),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        ));
   }
 }

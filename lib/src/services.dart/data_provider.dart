@@ -2,21 +2,21 @@ import 'package:berichtsheft/src/models/berichtsheft_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DataProvider {
-  String schoolBoilerplate = """
-  BWL: 
-  VWL:
-  Programmieren:
-  ITS:
-  Englisch:
-  Deutsch:
-  Geschichte:
-  Elektro:
-  Digitaltechnik
-  """;
+  static Future<BerichstsheftModel> getData() async {
+    const String schoolBoilerplate = """
+    BWL: 
+    VWL:
+    Programmieren:
+    ITS:
+    Englisch:
+    Deutsch:
+    Geschichte:
+    Elektro:
+    Digitaltechnik:
+    """;
 
-  Future<BerichstsheftModel> getData() async {
     SharedPreferences _prefs = await SharedPreferences.getInstance();
-    String schulText = _prefs.getString("schulText") ?? "";
+    String schulText = _prefs.getString("schulText") ?? schoolBoilerplate;
     String berichtText = _prefs.getString("berichtText") ?? "";
     String aufgabenText = _prefs.getString("aufgabenText") ?? "";
 
@@ -31,7 +31,7 @@ class DataProvider {
   //   await _prefs.remove("aufgabenText");
   // }
 
-  Future<bool> saveData(BerichstsheftModel data) async {
+  static Future<bool> saveData(BerichstsheftModel data) async {
     SharedPreferences _prefs = await SharedPreferences.getInstance();
     try {
       await _prefs.setString("schulText", data.schule);
@@ -43,11 +43,10 @@ class DataProvider {
     }
   }
 
-  Future<void> delete() async {
+  static Future<void> delete() async {
     SharedPreferences _prefs = await SharedPreferences.getInstance();
     await _prefs.remove("schulText");
     await _prefs.remove("berichtText");
     await _prefs.remove("aufgabenText");
-    await _prefs.setString("schulText", schoolBoilerplate);
   }
 }
